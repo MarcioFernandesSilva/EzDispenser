@@ -1,0 +1,50 @@
+<div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+  <div class="flex justify-between items-baseline mb-4">
+    <h3 class="text-slate-800 font-bold text-lg">Receita no Período</h3>
+    <span class="text-slate-500 text-sm">Visualização de tendência</span>
+  </div>
+
+  <div
+    class="w-full aspect-[4/1] bg-slate-50 border border-slate-100 rounded-md overflow-hidden relative"
+  >
+    <!-- SVG Mágico -->
+    <svg
+      class="w-full h-full block"
+      [attr.viewBox]="'0 0 ' + viewBoxWidth + ' ' + viewBoxHeight"
+      preserveAspectRatio="none"
+    >
+      <!-- Gradiente -->
+      <defs>
+        <linearGradient id="gradient" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stop-color="#4F46E5" stop-opacity="0.3" />
+          <stop offset="100%" stop-color="#4F46E5" stop-opacity="0" />
+        </linearGradient>
+      </defs>
+
+      <!-- Linha -->
+      <polyline
+        [attr.points]="points"
+        fill="none"
+        stroke="#4F46E5"
+        stroke-width="3"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+
+      <!-- Preenchimento -->
+      <polygon
+        [attr.points]="
+          '0,' + viewBoxHeight + ' ' + points + ' ' + viewBoxWidth + ',' + viewBoxHeight
+        "
+        fill="url(#gradient)"
+      />
+    </svg>
+  </div>
+
+  <!-- Legendas -->
+  <div class="flex justify-between mt-2 text-xs text-slate-400 font-medium">
+    <span>{{ labels[0] }}</span>
+    <span *ngIf="labels.length > 2">{{ labels[Math.floor(labels.length / 2)] }}</span>
+    <span *ngIf="labels.length > 1">{{ labels[labels.length - 1] }}</span>
+  </div>
+</div>

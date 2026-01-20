@@ -1,0 +1,99 @@
+<div
+  class="min-h-screen bg-slate-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans"
+>
+  <div class="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg border border-slate-100">
+    <div>
+      <h2 class="mt-6 text-center text-3xl font-extrabold text-slate-900">Criar Conta</h2>
+      <p class="mt-2 text-center text-sm text-slate-600">
+        Use o código <strong>123456</strong> para simular.
+      </p>
+    </div>
+
+    <div *ngIf="errorMessage" class="bg-red-50 text-red-700 p-3 rounded-md text-sm">
+      {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="createForm" (ngSubmit)="onSubmit()" class="mt-8 space-y-6">
+      <div class="rounded-md shadow-sm space-y-4">
+        <app-input-text
+          [parentForm]="createForm"
+          controlName="name"
+          label="Nome Completo"
+          placeholder="João Silva"
+        ></app-input-text>
+
+        <app-input-email
+          [parentForm]="createForm"
+          controlName="email"
+          label="Email"
+          placeholder="seu@email.com"
+        ></app-input-email>
+
+        <app-input-text
+          [parentForm]="createForm"
+          controlName="code"
+          label="Código de Acesso"
+          placeholder="Ex: 123456"
+        ></app-input-text>
+
+        <div>
+          <app-input-password
+            [parentForm]="createForm"
+            controlName="password"
+            label="Senha"
+          ></app-input-password>
+
+          <div class="mt-2 flex gap-1 h-1.5 overflow-hidden rounded-full bg-slate-100">
+            <div
+              class="h-full transition-all duration-300"
+              [class.bg-red-500]="strength >= 1"
+              [class.bg-slate-200]="strength < 1"
+              style="width: 25%"
+            ></div>
+            <div
+              class="h-full transition-all duration-300"
+              [class.bg-orange-500]="strength >= 2"
+              [class.bg-slate-200]="strength < 2"
+              style="width: 25%"
+            ></div>
+            <div
+              class="h-full transition-all duration-300"
+              [class.bg-yellow-500]="strength >= 3"
+              [class.bg-slate-200]="strength < 3"
+              style="width: 25%"
+            ></div>
+            <div
+              class="h-full transition-all duration-300"
+              [class.bg-green-500]="strength >= 4"
+              [class.bg-slate-200]="strength < 4"
+              style="width: 25%"
+            ></div>
+          </div>
+        </div>
+
+        <app-input-password
+          [parentForm]="createForm"
+          controlName="confirmPassword"
+          label="Confirmar Senha"
+        ></app-input-password>
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="createForm.invalid || isLoading"
+        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none disabled:opacity-50"
+      >
+        {{ isLoading ? 'Criando Conta...' : 'Criar Conta' }}
+      </button>
+
+      <div class="text-center">
+        <a
+          routerLink="/auth/login"
+          class="font-medium text-indigo-600 hover:text-indigo-500 text-sm"
+        >
+          &larr; Voltar para Login
+        </a>
+      </div>
+    </form>
+  </div>
+</div>

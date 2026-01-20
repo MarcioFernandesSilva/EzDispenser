@@ -1,0 +1,161 @@
+<div class="p-8 max-w-7xl mx-auto font-sans">
+  <header class="flex justify-between items-center mb-8">
+    <h1 class="text-slate-800 text-3xl font-bold">{{ title }}</h1>
+
+    <div class="flex items-center gap-6">
+      <!-- Botões de Filtro -->
+      <div class="bg-slate-100 p-1 rounded-lg flex gap-1">
+        <button
+          (click)="setPeriod(7)"
+          [ngClass]="
+            (period$ | async) === 7
+              ? 'bg-indigo-600 text-white shadow-md'
+              : 'bg-white text-slate-500 hover:text-slate-900 border border-transparent'
+          "
+          class="px-4 py-2 rounded-md text-sm font-medium transition-all duration-200"
+        >
+          7 dias
+        </button>
+        <button
+          (click)="setPeriod(30)"
+          [ngClass]="
+            (period$ | async) === 30
+              ? 'bg-indigo-600 text-white shadow-md'
+              : 'bg-white text-slate-500 hover:text-slate-900 border border-transparent'
+          "
+          class="px-4 py-2 rounded-md text-sm font-medium transition-all duration-200"
+        >
+          30 dias
+        </button>
+      </div>
+
+      <button
+        (click)="deleteAccount()"
+        class="bg-slate-100 text-slate-700 px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-slate-200 transition-colors border border-slate-300"
+      >
+        Excluir Conta
+      </button>
+
+      <button
+        (click)="logout()"
+        class="bg-red-100 text-red-700 px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-red-200 transition-colors"
+      >
+        Sair
+      </button>
+    </div>
+  </header>
+
+  <div *ngIf="dashboardData$ | async as data; else loading">
+    <!-- KPI Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+      <!-- Card 1 -->
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <h3 class="text-slate-500 text-sm mb-2">Faturamento</h3>
+        <p class="text-slate-900 text-3xl font-bold">{{ data.kpis.revenue | currency: 'BRL' }}</p>
+      </div>
+      <!-- Card 2 -->
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <h3 class="text-slate-500 text-sm mb-2">Pedidos</h3>
+        <p class="text-slate-900 text-3xl font-bold">{{ data.kpis.orders }}</p>
+      </div>
+      <!-- Card 3 -->
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <h3 class="text-slate-500 text-sm mb-2">Ticket Médio</h3>
+        <p class="text-slate-900 text-3xl font-bold">
+          {{ data.kpis.averageTicket | currency: 'BRL' }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Gráfico -->
+    <div class="mb-8">
+      <app-revenue-chart
+        [labels]="data.chartData.labels"
+        [values]="data.chartData.values"
+      ></app-revenue-chart>
+    </div>
+
+    <!-- Tabela -->
+    <!-- Tabela -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <!-- Header da Tabela com Busca -->
+      <div class="p-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+        <h3 class="text-slate-700 font-bold">Pedidos Recentes</h3>
+        <input
+          type="text"
+          placeholder="Buscar por cliente..."
+          class="px-3 py-1.5 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          (input)="searchTerm = $any($event.target).value"
+        />
+      </div>
+
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr>
+            <th
+              class="bg-slate-50 text-slate-500 font-semibold text-sm p-4 border-b border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors select-none group"
+              (click)="toggleSort('date')"
+            >
+              Data
+              <span *ngIf="sortColumn === 'date'" class="inline-block ml-1 text-indigo-600">
+                {{ sortDirection === 'asc' ? '↑' : '↓' }}
+              </span>
+            </th>
+            <th
+              class="bg-slate-50 text-slate-500 font-semibold text-sm p-4 border-b border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors select-none group"
+              (click)="toggleSort('client')"
+            >
+              Cliente
+              <span *ngIf="sortColumn === 'client'" class="inline-block ml-1 text-indigo-600">
+                {{ sortDirection === 'asc' ? '↑' : '↓' }}
+              </span>
+            </th>
+            <th
+              class="bg-slate-50 text-slate-500 font-semibold text-sm p-4 border-b border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors select-none group"
+              (click)="toggleSort('value')"
+            >
+              Valor
+              <span *ngIf="sortColumn === 'value'" class="inline-block ml-1 text-indigo-600">
+                {{ sortDirection === 'asc' ? '↑' : '↓' }}
+              </span>
+            </th>
+            <th
+              class="bg-slate-50 text-slate-500 font-semibold text-sm p-4 border-b border-slate-200"
+            >
+              Status
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let order of getFilteredOrders(data.recentOrders)"
+            class="border-b border-slate-200 last:border-b-0 hover:bg-slate-50 transition-colors"
+          >
+            <td class="p-4 text-slate-700">{{ order.date }}</td>
+            <td class="p-4 text-slate-700">{{ order.client }}</td>
+            <td class="p-4 text-slate-700 font-medium">{{ order.value | currency: 'BRL' }}</td>
+            <td class="p-4">
+              <span
+                [ngClass]="{
+                  'bg-green-100 text-green-800': order.status === 'completed',
+                  'bg-yellow-100 text-yellow-800': order.status === 'pending',
+                }"
+                class="px-3 py-1 rounded-full text-xs font-medium"
+              >
+                {{ order.status === 'completed' ? 'Concluído' : 'Pendente' }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <ng-template #loading>
+    <div class="flex justify-center items-center min-h-[300px]">
+      <div
+        class="w-12 h-12 rounded-full border-4 border-indigo-100 border-b-indigo-600 animate-spin"
+      ></div>
+    </div>
+  </ng-template>
+</div>
