@@ -23,7 +23,7 @@ export class CreateAccount {
     this.createForm = this.fb.group({
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      code: ['', Validators.required], // Código mock do "primeiro acesso"
+      code: ['', Validators.required],
       password: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', Validators.required],
     });

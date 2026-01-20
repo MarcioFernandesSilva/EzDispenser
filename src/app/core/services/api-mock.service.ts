@@ -82,33 +82,29 @@ export class ApiMockService {
     );
   }
 
-  // Auth: Login
+  // Autenticação: Login
   login(email: string, pass: string): Observable<{ token: string }> {
     const delaySimulado = Math.random() * 600 + 600;
     return timer(delaySimulado).pipe(
       switchMap(() => {
-        // USUÁRIO SEMENTE (SEED) PARA TESTES
         const SEED_USER = { email: 'admin@ez.com', pass: '123456' };
 
-        // 1. Verifica se é o usuário seed
         if (email === SEED_USER.email && pass === SEED_USER.pass) {
           return of({ token: 'mock-jwt-token-admin-123' });
         }
 
-        // 2. Tenta buscar usuário salvo no "Banco de Dados" Local
         const storedPassword = localStorage.getItem('mock_user_' + email);
 
         if (storedPassword && pass === storedPassword) {
           return of({ token: 'mock-jwt-token-user-' + Date.now() });
         } else {
-          // Se não achou no storage nem é o seed, ou senha errada -> ERRO real
           return throwError(() => new Error('Credenciais Inválidas'));
         }
       }),
     );
   }
 
-  // Auth: Request Password Reset
+  // Autenticação: Solicitar Redefinição
   requestPasswordReset(email: string): Observable<{ resetId: string }> {
     const delaySimulado = Math.random() * 600 + 600;
     return timer(delaySimulado).pipe(
@@ -117,9 +113,14 @@ export class ApiMockService {
 
         // Validação: Usuário existe?
         const isSeed = email === 'admin@ez.com';
+
+        if (isSeed) {
+          return throwError(() => new Error('A senha do administrador não pode ser redefinida.'));
+        }
+
         const storedUser = localStorage.getItem('mock_user_' + email);
 
-        if (!isSeed && !storedUser) {
+        if (!storedUser) {
           return throwError(() => new Error('Usuário não encontrado. Crie uma conta primeiro.'));
         }
 
@@ -128,14 +129,13 @@ export class ApiMockService {
     );
   }
 
-  // Auth: Confirm Password Reset
+  // Autenticação: Confirmar Redefinição
   confirmPasswordReset(email: string, code: string, newPassword: string): Observable<void> {
     const delaySimulado = Math.random() * 600 + 600;
     return timer(delaySimulado).pipe(
       switchMap(() => {
         if (code !== '123456') return throwError(() => new Error('Código inválido ou expirado'));
 
-        // SALVA A NOVA SENHA NO STORAGE
         localStorage.setItem('mock_user_' + email, newPassword);
 
         return of(void 0);
@@ -143,7 +143,7 @@ export class ApiMockService {
     );
   }
 
-  // Auth: Create Password
+  // Autenticação: Criar Senha
   createPassword(email: string, code: string, newPassword: string): Observable<void> {
     const delaySimulado = Math.random() * 600 + 600;
     return timer(delaySimulado).pipe(
@@ -163,7 +163,6 @@ export class ApiMockService {
           return throwError(() => new Error('Este usuário já possui cadastro. Faça Login.'));
         }
 
-        // SALVA O USUÁRIO NO STORAGE (SIMULANDO DB)
         localStorage.setItem('mock_user_' + email, newPassword);
 
         return of(void 0);

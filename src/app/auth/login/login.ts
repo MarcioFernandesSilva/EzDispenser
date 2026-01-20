@@ -35,7 +35,6 @@ export class Login {
 
     this.authService.login(email, password).subscribe({
       next: (sucesso: boolean) => {
-        console.log('Login Sucesso!', sucesso);
         this.router.navigate(['/dashboard']);
       },
       error: (erro: any) => {

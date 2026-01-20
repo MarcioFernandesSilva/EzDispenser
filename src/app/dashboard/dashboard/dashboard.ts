@@ -15,7 +15,6 @@ export class DashboardComponent implements OnInit {
 
   period$ = new BehaviorSubject<7 | 30>(30);
 
-  // Agora aceita null (que representará o estado "Carregando...")
   dashboardData$: Observable<DashboardData | null> | undefined;
 
   searchTerm = '';
@@ -40,7 +39,6 @@ export class DashboardComponent implements OnInit {
     this.period$.next(period);
   }
 
-  // Lógica de Filtro e Ordenação (Cliente-Side)
   getFilteredOrders(orders: any[]) {
     if (!orders) return [];
 
@@ -52,13 +50,11 @@ export class DashboardComponent implements OnInit {
       let valA: any = a[this.sortColumn];
       let valB: any = b[this.sortColumn];
 
-      // Tratamento especial para Datas (dd/MM/yyyy)
       if (this.sortColumn === 'date') {
         valA = this.parseDate(a.date);
         valB = this.parseDate(b.date);
       }
 
-      // Tratamento para Strings (Case insensitive)
       if (typeof valA === 'string') valA = valA.toLowerCase();
       if (typeof valB === 'string') valB = valB.toLowerCase();
 
